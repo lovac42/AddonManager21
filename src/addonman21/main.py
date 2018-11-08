@@ -16,9 +16,9 @@ class AddonManager21(AddonManager):
 
     def __init__(self, mw):
         self.mw = mw
-        action = QAction('>> AM21 Configurations <<', mw)
+        action = QAction('Addon Configurations...', mw)
         action.triggered.connect(self.onAddonsDialog)
-        mw.form.menuPlugins.addAction(action)
+        mw.form.menuTools.addAction(action)
 
     def setConfigUpdatedAction(self, module, fn):
         addon = self.addonFromModule(module)
