@@ -7,7 +7,7 @@ import os
 
 
 class AddonManTest:
-    hotkey = None
+    hotkey = 'Shift+a'
 
     def __init__(self):
         addHook('showQuestion', self.onShowQuestion) #for test previews
@@ -25,7 +25,8 @@ class AddonManTest:
                         data=f.read()
                     config=json.loads(data)
 
-        self.hotkey=config['hotkey']
+        if config:
+            self.hotkey=config.get('hotkey','Shift+a')
 
         try: #Must be loaded after profile loads, after addonmanger21 loads.
             mw.addonManager.setConfigUpdatedAction(__name__, self.setHotkeys) 
