@@ -1,4 +1,5 @@
 from aqt import mw
+from aqt.qt import *
 from anki.hooks import addHook
 from aqt.utils import showText
 from codecs import open
@@ -11,7 +12,16 @@ class AddonManTest:
 
     def __init__(self):
         addHook('showQuestion', self.onShowQuestion) #for test previews
-        addHook('profileLoaded', self.setHotkeys)
+        addHook('profileLoaded', self.onProfileLoaded)
+
+    def onProfileLoaded(self):
+        self.setHotkeys()
+        QTimer.singleShot(1000, self.setHotkeysCallback)
+
+    def setHotkeysCallback(self):
+        try: #Must be loaded after profile loads, after addonmanger21 loads.
+            mw.addonManager.setConfigUpdatedAction(__name__, self.setHotkeys) 
+        except AttributeError: pass
 
     def setHotkeys(self, config=None):
         if not config:
@@ -27,11 +37,6 @@ class AddonManTest:
 
         if config:
             self.hotkey=config.get('hotkey','Shift+a')
-
-        try: #Must be loaded after profile loads, after addonmanger21 loads.
-            mw.addonManager.setConfigUpdatedAction(__name__, self.setHotkeys) 
-        except AttributeError: pass
-
 
     def onShowQuestion(self):  #for test previews
         showText("Hotkey is "+self.hotkey)
