@@ -16,7 +16,7 @@ class AddonManTest:
 
     def onProfileLoaded(self):
         self.setHotkeys()
-        QTimer.singleShot(1000, self.setHotkeysCallback)
+        mw.progress.timer(1000,self.setHotkeysCallback,False)
 
     def setHotkeysCallback(self):
         try: #Must be loaded after profile loads, after addonmanger21 loads.
