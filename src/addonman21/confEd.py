@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+# Copyright: Damien Elmes <anki@ichi2.net>
+# License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
+
+
 # Files are backported from anki-2.1.5 src
 
 import aqt, os, re

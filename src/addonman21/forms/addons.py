@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+# Copyright: Damien Elmes <anki@ichi2.net>
+# License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
+
 # Files are backported from anki-2.1.5 src
 
 # Form implementation generated from reading ui file 'designer/addons.ui'
@@ -35,11 +38,11 @@ class AddonsDialog_Ui_Dialog(object):
         # self.checkForUpdates = QtWidgets.QPushButton(Dialog)
         # self.checkForUpdates.setObjectName("checkForUpdates")
         # self.verticalLayout.addWidget(self.checkForUpdates)
-        # spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        # self.verticalLayout.addItem(spacerItem)
-        # self.viewPage = QtWidgets.QPushButton(Dialog)
-        # self.viewPage.setObjectName("viewPage")
-        # self.verticalLayout.addWidget(self.viewPage)
+        spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout.addItem(spacerItem)
+        self.viewPage = QtWidgets.QPushButton(Dialog)
+        self.viewPage.setObjectName("viewPage")
+        self.verticalLayout.addWidget(self.viewPage)
         self.config = QtWidgets.QPushButton(Dialog)
         self.config.setObjectName("config")
         self.verticalLayout.addWidget(self.config)
@@ -63,7 +66,7 @@ class AddonsDialog_Ui_Dialog(object):
         self.label.setText(_("Changes will take effect when Anki is restarted."))
         # self.getAddons.setText(_("Get Add-ons..."))
         # self.checkForUpdates.setText(_("Check for Updates"))
-        # self.viewPage.setText(_("View Add-on Page"))
+        self.viewPage.setText(_("View Add-on Page"))
         self.config.setText(_("Config"))
         # self.viewFiles.setText(_("View Files"))
         # self.toggleEnabled.setText(_("Toggle Enabled"))

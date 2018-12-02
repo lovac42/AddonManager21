@@ -1,10 +1,15 @@
+# -*- coding: utf-8 -*-
+# Copyright: Damien Elmes <anki@ichi2.net>
+# License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
+
+
 # Files are backported from anki-2.1.5 src
 
 import aqt, os, re
 from aqt import mw
 from aqt.qt import *
 from anki.hooks import addHook
-from aqt.utils import getText, tooltip, showText, showInfo
+from aqt.utils import getText, tooltip, showText, showInfo, showWarning, openLink
 from codecs import open
 from anki.utils import json
 from .forms.addons import AddonsDialog_Ui_Dialog
@@ -23,7 +28,7 @@ class AddonsDialog(QDialog):
         # f.getAddons.clicked.connect(self.onGetAddons)
         # f.checkForUpdates.clicked.connect(self.onCheckForUpdates)
         # f.toggleEnabled.clicked.connect(self.onToggleEnabled)
-        # f.viewPage.clicked.connect(self.onViewPage)
+        f.viewPage.clicked.connect(self.onViewPage)
         # f.viewFiles.clicked.connect(self.onViewFiles)
         # f.delete_2.clicked.connect(self.onDelete)
         f.config.clicked.connect(self.onConfig)
@@ -71,10 +76,18 @@ class AddonsDialog(QDialog):
 
     def onViewPage(self):
         addon = self.onlyOneSelected()
-        if not addon:
+        if not addon: return
+
+        try:
+            conf = self.mgr.addonMeta(addon)
+            aoid=conf.get('addonID',None)
+            assert aoid
+        except:
+            showWarning(_("Require meta.json file with 'addonID' set"))
             return
-        if re.match(r"^\d+$", addon):
-            openLink(aqt.appShared + "info/{}".format(addon))
+
+        if re.match(r"^\d+$", aoid):
+            openLink(aqt.appShared + "info/{}".format(aoid))
         else:
             showWarning(_("Add-on was not downloaded from AnkiWeb."))
 

@@ -1,6 +1,11 @@
+# -*- coding: utf-8 -*-
+# Copyright: Damien Elmes <anki@ichi2.net>
+# License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
+
+
 # Files are backported from anki-2.1.5 src
 
-import aqt, os, re
+import aqt, os, re, sys
 from aqt import mw
 from aqt.qt import *
 from aqt.utils import getText, tooltip, showText, showInfo
@@ -60,14 +65,6 @@ class AddonManager21(AddonManager):
     def _addonMetaPath(self, dir):
         return os.path.join(self.addonsFolder(dir), "meta.json")
 
-    def addonMeta(self, dir):
-        path = self._addonMetaPath(dir)
-        try:
-            with open(path, encoding="utf8") as f:
-                return json.load(f)
-        except:
-            return dict()
-
     def addonName(self, dir):
         return self.addonMeta(dir).get("name", dir)
 
@@ -108,10 +105,54 @@ class AddonManager21(AddonManager):
             return root
         return os.path.join(root, dir)
 
+    # def addonConfigDefaults(self, dir):
+        # path = os.path.join(self.addonsFolder(dir), "config.json")
+        # try:
+            # with open(path, encoding="utf8") as f:
+                # return json.load(f)
+        # except:
+            # return None
+
+
+    # def addonMeta(self, dir):
+        # path = self._addonMetaPath(dir)
+        # try:
+            # with open(path, encoding="utf8") as f:
+                # return json.load(f)
+        # except:
+            # return dict()
+
+
+#MODS FROM: https://github.com/Arthur-Milchior/anki-debug-json/blob/master/jsonErrorMessage.py
     def addonConfigDefaults(self, dir):
         path = os.path.join(self.addonsFolder(dir), "config.json")
         try:
             with open(path, encoding="utf8") as f:
-                return json.load(f)
+                t=f.read()
+                try:
+                    return json.loads(t)
+                except Exception as e:
+                    print "Here is a JSON error in default config of addon {dir}:".format(dir=sys.stderr)
+                    print str(e)
+                    print "\n\n===================\n\nCopy and save past config to be sure that it is not overwritten by accident. Past config was {t}".format(t=sys.stderr)
+                    return dict()
         except:
             return None
+
+
+#MODS FROM: https://github.com/Arthur-Milchior/anki-debug-json/blob/master/jsonErrorMessage.py
+    def addonMeta(self, dir):
+        path = self._addonMetaPath(dir)
+        try:
+            with open(path, encoding="utf8") as f:
+                t=f.read()
+                try:
+                    return json.loads(t)
+                except Exception as e:
+                    print "Here is a JSON error in current config of addon {dir}:".format(dir=sys.stderr)
+                    print str(e)
+                    print "\n\n===================\n\n \
+Copy and save past config to be sure that it is not overwritten by accident. Past config was {t}".format(t=sys.stderr)
+        except: pass
+        return dict()
+
