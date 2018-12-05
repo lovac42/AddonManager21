@@ -79,12 +79,16 @@ class AddonsDialog(QDialog):
         if not addon: return
 
         try:
-            conf = self.mgr.addonMeta(addon)
-            aoid=conf.get('addonID',None)
+            meta = self.mgr.addonMeta(addon)
+            aoid=meta.get('addonID',None)
             assert aoid
         except:
-            showWarning(_("Require meta.json file with 'addonID' set"))
-            return
+            # showWarning(_("Require meta.json file with 'addonID' set"))
+            meta = self.mgr.addonMeta(addon)
+            id,ok=getText('Enter missing addonID')
+            if not ok: return
+            meta['addonID'] = aoid = id
+            self.mgr.writeAddonMeta(addon, meta)
 
         if re.match(r"^\d+$", aoid):
             openLink(aqt.appShared + "info/{}".format(aoid))
