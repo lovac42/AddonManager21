@@ -13,6 +13,10 @@ from codecs import open
 from anki.utils import json
 from aqt.addons import AddonManager
 from .dialog import AddonsDialog
+import urllib2
+
+
+USER_AGENT='Anki 2.0 SpeedRabit'
 
 
 class AddonManager21(AddonManager):
@@ -105,22 +109,72 @@ class AddonManager21(AddonManager):
             return root
         return os.path.join(root, dir)
 
-    # def addonConfigDefaults(self, dir):
-        # path = os.path.join(self.addonsFolder(dir), "config.json")
-        # try:
-            # with open(path, encoding="utf8") as f:
-                # return json.load(f)
-        # except:
-            # return None
+    def managedAddons(self):
+        self.addonSID={}
+        addons=[]
+        for dir in self.allAddons():
+            try:
+                meta = self.addonMeta(dir)
+                aoid=meta.get('addonID',None)
+                assert aoid
+                addons.append(aoid)
+                self.addonSID[aoid]=dir
+            except:
+                continue
+        return addons
 
 
-    # def addonMeta(self, dir):
-        # path = self._addonMetaPath(dir)
-        # try:
-            # with open(path, encoding="utf8") as f:
-                # return json.load(f)
-        # except:
-            # return dict()
+    # Updating
+    ######################################################################
+
+    def checkForUpdates(self):
+        # get mod times
+        self.mw.progress.start(immediate=True)
+        try:
+            # ..of enabled items downloaded from ankiweb
+            addons = self.managedAddons()
+            mods = []
+            while addons:
+                chunk = addons[:25]
+                del addons[:25]
+                mods.extend(self._getModTimes(None, chunk))
+            return self._updatedIds(mods)
+        finally:
+            self.mw.progress.finish()
+
+    def _getModTimes(self, client, chunk):
+        try:
+            url=aqt.appShared + "updates/" + ",".join(chunk)
+            crawler = urllib2.build_opener()
+            crawler.addheaders = [('User-agent', USER_AGENT)]
+            c = crawler.open(url)
+            data=c.read()
+            return json.loads(data)
+        except ValueError:
+           utils.showInfo("Not a valid url")
+           return
+        except urllib2.HTTPError as error:
+            showWarning('The remote server has returned an error:'
+                        ' HTTP Error {} ({})'.format(error.code,error.reason))
+            return
+
+    def _updatedIds(self, mods):
+        updated = []
+        for dir, ts in mods:
+            if not ts: continue #null for anki 2.0 only addons, use a fake __init__ file to set time on server.
+
+            sid = self.addonSID.get(str(dir),None)
+            if not sid: continue
+
+            meta=self.addonMeta(sid)
+            mod=int(meta.get("mod","-1"))
+            if mod < ts:
+                updated.append(sid)
+                #Mark as updated
+                meta['mod'] = str(ts)
+                self.writeAddonMeta(sid, meta)
+        return updated
+
 
 
 #MODS FROM: https://github.com/Arthur-Milchior/anki-debug-json/blob/master/jsonErrorMessage.py

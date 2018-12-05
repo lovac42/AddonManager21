@@ -26,7 +26,7 @@ class AddonsDialog(QDialog):
         f = self.form = AddonsDialog_Ui_Dialog()
         f.setupUi(self)
         # f.getAddons.clicked.connect(self.onGetAddons)
-        # f.checkForUpdates.clicked.connect(self.onCheckForUpdates)
+        f.checkForUpdates.clicked.connect(self.onCheckForUpdates)
         # f.toggleEnabled.clicked.connect(self.onToggleEnabled)
         f.viewPage.clicked.connect(self.onViewPage)
         # f.viewFiles.clicked.connect(self.onViewFiles)
@@ -83,7 +83,6 @@ class AddonsDialog(QDialog):
             aoid=meta.get('addonID',None)
             assert aoid
         except:
-            # showWarning(_("Require meta.json file with 'addonID' set"))
             meta = self.mgr.addonMeta(addon)
             id,ok=getText('Enter missing addonID')
             if not ok: return
@@ -131,15 +130,15 @@ class AddonsDialog(QDialog):
             tooltip(_("No updates available."))
         else:
             names = [self.mgr.addonName(d) for d in updated]
-            if askUser(_("Update the following add-ons?") +
-                               "\n" + "\n".join(names)):
-                log, errs = self.mgr.downloadIds(updated)
-                if log:
-                    tooltip("\n".join(log), parent=self)
-                if errs:
-                    showWarning("\n".join(errs), parent=self)
-
-                self.redrawAddons()
+            showText('New Updates:\n'+"\n  ".join(names))
+            # if askUser(_("Update the following add-ons?") +
+                               # "\n" + "\n".join(names)):
+                # log, errs = self.mgr.downloadIds(updated)
+                # if log:
+                    # tooltip("\n".join(log), parent=self)
+                # if errs:
+                    # showWarning("\n".join(errs), parent=self)
+                # self.redrawAddons()
 
     def onConfig(self):
         addon = self.onlyOneSelected()
