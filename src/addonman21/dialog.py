@@ -12,6 +12,7 @@ from anki.hooks import addHook
 from aqt.utils import getText, tooltip, showText, showInfo, showWarning, openLink
 from codecs import open
 from anki.utils import json
+from aqt.addons import GetAddons
 from .forms.addons import AddonsDialog_Ui_Dialog
 from .confEd import ConfigEditor
 
@@ -25,7 +26,7 @@ class AddonsDialog(QDialog):
 
         f = self.form = AddonsDialog_Ui_Dialog()
         f.setupUi(self)
-        # f.getAddons.clicked.connect(self.onGetAddons)
+        f.getAddons.clicked.connect(self.onGetAddons)
         f.checkForUpdates.clicked.connect(self.onCheckForUpdates)
         # f.toggleEnabled.clicked.connect(self.onToggleEnabled)
         f.viewPage.clicked.connect(self.onViewPage)
@@ -122,7 +123,7 @@ class AddonsDialog(QDialog):
         self.redrawAddons()
 
     def onGetAddons(self):
-        GetAddons(self)
+        GetAddons(self.mw)
 
     def onCheckForUpdates(self):
         updated = self.mgr.checkForUpdates()
