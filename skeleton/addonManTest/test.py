@@ -11,23 +11,30 @@ class AddonManTest:
     hotkey = 'Shift+a'
 
     def __init__(self):
-        addHook('showQuestion', self.onShowQuestion) #for test previews
         addHook('profileLoaded', self.onProfileLoaded)
 
+        #for test previews
+        addHook('showQuestion', self.onShowQuestion) 
+
+
     def onProfileLoaded(self):
-        self.setHotkeys()
-        mw.progress.timer(1000,self.setHotkeysCallback,False)
+        #Add timer, must be loaded after addonmanger21 loads.
+        mw.progress.timer(200,self.setHotkeys,False)
+        mw.progress.timer(300,self.setHotkeysCallback,False)
+
 
     def setHotkeysCallback(self):
-        try: #Must be loaded after profile loads, after addonmanger21 loads.
-            mw.addonManager.setConfigUpdatedAction(__name__, self.setHotkeys) 
-        except AttributeError: pass
+        if getattr(mw.addonManager, "setConfigUpdatedAction", None):
+            mw.addonManager.setConfigUpdatedAction(__name__, self.setHotkeys)
+        else:
+            print('addonManager21 Not Loaded')
+
 
     def setHotkeys(self, config=None):
         if not config:
-            try:
+            if getattr(mw.addonManager, "getConfig", None):
                 config=mw.addonManager.getConfig(__name__)
-            except AttributeError:
+            else:
                 moduleDir, _ = os.path.split(__file__)
                 path = os.path.join(moduleDir, 'config.json')
                 if os.path.exists(path):
@@ -37,6 +44,7 @@ class AddonManTest:
 
         if config:
             self.hotkey=config.get('hotkey','Shift+a')
+
 
     def onShowQuestion(self):  #for test previews
         showText("Hotkey is "+self.hotkey)
