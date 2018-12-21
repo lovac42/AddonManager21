@@ -2,7 +2,7 @@
 # Copyright: (C) 2018 Lovac42
 # Support: https://github.com/lovac42/AddonManager21
 # License: GNU GPL, version 3 or later; http://www.gnu.org/copyleft/gpl.html
-# Version: 0.0.1
+# Version: 0.0.2
 
 
 from aqt import mw
@@ -14,35 +14,51 @@ import os
 
 
 class Config():
-    config = None
+    config = {}
 
     def __init__(self, addonName):
         self.addonName=addonName
-        addHook('profileLoaded', self.onProfileLoaded)
+        addHook('profileLoaded', self._onProfileLoaded)
 
-    def onProfileLoaded(self):
-        mw.progress.timer(300,self.setConfig,False)
+    def set(self, key, value):
+        self.config[key]=value
 
     def get(self, key, default=None):
-        return self.config.get(key, default);
+        return self.config.get(key, default)
 
-    def setConfig(self):
+    def has(self, key):
+        return not self.config.get(key)==None
+
+
+    def _onProfileLoaded(self):
+        mw.progress.timer(300,self._loadConfig,False)
+
+    def _loadConfig(self):
         if getattr(mw.addonManager, "getConfig", None):
-            config=mw.addonManager.getConfig(__name__)
-            mw.addonManager.setConfigUpdatedAction(__name__, self.updateConfig)
+            self.config=mw.addonManager.getConfig(__name__)
+            mw.addonManager.setConfigUpdatedAction(__name__, self._updateConfig)
         else:
-            config=self.readConfig('config.json')
-        self.updateConfig(config)
+            self.config=self._readConfig()
         runHook(self.addonName+'.configLoaded')
 
-    def updateConfig(self, config):
-        self.config=config
+    def _updateConfig(self, config):
+        self.config.update(config)
+        runHook(self.addonName+'.configUpdated')
 
-    def readConfig(self, fname):
+    def _readConfig(self):
+        conf={}
         moduleDir, _ = os.path.split(__file__)
-        path = os.path.join(moduleDir,fname)
+        # Read config.json
+        path = os.path.join(moduleDir,'config.json')
         if os.path.exists(path):
             with open(path, 'r', encoding='utf-8') as f:
                 data=f.read()
-            return json.loads(data)
-
+            conf=json.loads(data)
+        # Read meta.json
+        path = os.path.join(moduleDir,'meta.json')
+        if os.path.exists(path):
+            with open(path, 'r', encoding='utf-8') as f:
+                data=f.read()
+            meta=json.loads(data)
+            conf.update(meta.get('config',{}))
+        return conf
