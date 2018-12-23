@@ -70,7 +70,7 @@ class AddonManager21(AddonManager):
         return os.path.join(self.addonsFolder(dir), "meta.json")
 
     def addonName(self, dir):
-        return self.addonMeta(dir).get("name", dir)
+        return self.addonMetaID(dir).get("name", dir)
 
     def configAction(self, addon):
         return self._configButtonActions.get(addon)
@@ -100,6 +100,12 @@ class AddonManager21(AddonManager):
         with open(path, "w", encoding="utf8") as f:
             json.dump(meta, f)
 
+#Use for writing addonID from custom input
+    def writeAddonMetaID(self, dir, meta):
+        path = os.path.join(self.addonsFolder(dir), "meta_id.json")
+        with open(path, "w", encoding="utf8") as f:
+            json.dump(meta, f)
+
     def addonFromModule(self, module):
         return module.split(".")[0]
 
@@ -114,7 +120,7 @@ class AddonManager21(AddonManager):
         addons=[]
         for dir in self.allAddons():
             try:
-                meta = self.addonMeta(dir)
+                meta = self.addonMetaID(dir)
                 aoid=meta.get('addonID',None)
                 assert aoid
                 addons.append(aoid)
@@ -210,3 +216,17 @@ Copy and save past config to be sure that it is not overwritten by accident. Pas
         except: pass
         return dict()
 
+    def addonMetaID(self, dir):
+        path = os.path.join(self.addonsFolder(dir), "meta_id.json")
+        try:
+            with open(path, encoding="utf8") as f:
+                t=f.read()
+                try:
+                    return json.loads(t)
+                except Exception as e:
+                    print "Here is a JSON error in current config of addon {dir}:".format(dir=sys.stderr)
+                    print str(e)
+                    print "\n\n===================\n\n \
+Copy and save past config to be sure that it is not overwritten by accident. Past config was {t}".format(t=sys.stderr)
+        except: pass
+        return dict()
