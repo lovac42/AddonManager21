@@ -100,6 +100,7 @@ class AddonManager21(AddonManager):
         with open(path, "w", encoding="utf8") as f:
             json.dump(meta, f)
 
+#Use for writing addonID from custom input
     def writeAddonMetaID(self, dir, meta):
         path = os.path.join(self.addonsFolder(dir), "meta_id.json")
         with open(path, "w", encoding="utf8") as f:
@@ -171,13 +172,13 @@ class AddonManager21(AddonManager):
             sid = self.addonSID.get(str(dir),None)
             if not sid: continue
 
-            meta=self.addonMetaID(sid)
+            meta=self.addonMeta(sid)
             mod=int(meta.get("mod","-1"))
             if mod < ts:
                 updated.append(sid)
                 #Mark as updated
                 meta['mod'] = str(ts)
-                self.writeAddonMetaID(sid, meta)
+                self.writeAddonMeta(sid, meta)
         return updated
 
 

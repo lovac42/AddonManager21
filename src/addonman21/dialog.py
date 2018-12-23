@@ -80,7 +80,7 @@ class AddonsDialog(QDialog):
         if not addon: return
 
         try:
-            meta = self.mgr.addonMeta(addon)
+            meta = self.mgr.addonMetaID(addon)
             aoid=meta.get('addonID',None)
             assert aoid
         except:
@@ -88,7 +88,7 @@ class AddonsDialog(QDialog):
             id,ok=getText('Enter missing addonID')
             if not ok: return
             meta['addonID'] = aoid = id
-            self.mgr.writeAddonMeta(addon, meta)
+            self.mgr.writeAddonMetaID(addon, meta)
 
         if re.match(r"^\d+$", aoid):
             openLink(aqt.appShared + "info/{}".format(aoid))
