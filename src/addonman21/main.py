@@ -45,7 +45,8 @@ class AddonManager21(AddonManager):
         # merge in user's keys
         meta = self.addonMeta(addon)
         userConf = meta.get("config", {})
-        config.update(userConf)
+        # config.update(userConf)
+        config=nestedUpdate(config,userConf) #update nested dicts
         return config
 
     def allAddons(self):
@@ -230,3 +231,16 @@ Copy and save past config to be sure that it is not overwritten by accident. Pas
 Copy and save past config to be sure that it is not overwritten by accident. Past config was {t}".format(t=sys.stderr)
         except: pass
         return dict()
+
+
+
+#update nested dicts ===============================
+# https://stackoverflow.com/questions/3232943/
+import collections
+def nestedUpdate(d,u):
+    for k, v in u.iteritems():
+        if isinstance(v, collections.Mapping):
+            d[k] = nestedUpdate(d.get(k, {}), v)
+        else:
+            d[k] = v
+    return d
