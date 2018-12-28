@@ -36,6 +36,11 @@ class AddonsDialog(QDialog):
         # f.delete_2.clicked.connect(self.onDelete)
         f.config.clicked.connect(self.onConfig)
         self.form.addonList.currentRowChanged.connect(self._onAddonItemSelected)
+        self.form.addonList.itemDoubleClicked.connect(self.onConfig)
+
+
+
+
         self.redrawAddons()
         self.show()
 
