@@ -2,7 +2,7 @@
 # Copyright: (C) 2018-2019 Lovac42
 # Support: https://github.com/lovac42/AddonManager21
 # License: GNU GPL, version 3 or later; http://www.gnu.org/copyleft/gpl.html
-# Version: 0.0.4
+# Version: 0.0.5
 
 
 from aqt import mw
@@ -40,10 +40,10 @@ class Config():
 
     def _loadConfig(self):
         if getattr(mw.addonManager, "getConfig", None):
-            self.config=mw.addonManager.getConfig(__name__)
             mw.addonManager.setConfigUpdatedAction(__name__, self._updateConfig)
-        else:
-            self.config=self._readConfig()
+            # self.config=mw.addonManager.getConfig(__name__)
+        # else:
+        self.config=self._readConfig()
         runHook(self.addonName+'.configLoaded')
 
     def _updateConfig(self, config):
@@ -51,29 +51,28 @@ class Config():
         runHook(self.addonName+'.configUpdated')
 
     def _readConfig(self):
-        conf={}
-        moduleDir, _ = os.path.split(__file__)
-        # Read config.json
-        path = os.path.join(moduleDir,'config.json')
-        if os.path.exists(path):
-            with open(path, 'r', encoding='utf-8') as f:
-                data=f.read()
-            conf=json.loads(data)
-        # Read meta.json
-        path = os.path.join(moduleDir,'meta.json')
-        if os.path.exists(path):
-            with open(path, 'r', encoding='utf-8') as f:
-                data=f.read()
-            meta=json.loads(data)
+        conf=self.readFile('config.json')
+        meta=self.readFile('meta.json')
+        if meta:
             conf=nestedUpdate(conf,meta.get('config',{}))
         return conf
+
+    def readFile(self, fname, jsn=True):
+        moduleDir, _ = os.path.split(__file__)
+        path = os.path.join(moduleDir,fname)
+        if os.path.exists(path):
+            with open(path, 'r', encoding='utf-8') as f:
+                data=f.read()
+            if jsn:
+                return json.loads(data)
+            return data
 
 
 #From: https://stackoverflow.com/questions/3232943/
 def nestedUpdate(d, u):
-    if ANKI21:
+    if ANKI21: #py3.3+
         itms=u.items()
-    else:
+    else: #py2.7
         itms=u.iteritems()
     for k, v in itms:
         if isinstance(v, collections.Mapping):
