@@ -27,6 +27,7 @@ class AddonManager21(AddonManager):
 
     def __init__(self, mw):
         self.mw = mw
+        self._menus = []
         action = QAction('Addon Configurations...', mw)
         action.triggered.connect(self.onAddonsDialog)
         mw.form.menuTools.addAction(action)
