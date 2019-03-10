@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-# Files are backported from anki-2.1.5 src with a few mods here and there.
+# Copyright: (C) 2018-2019 Lovac42
 # Support: https://github.com/lovac42/AddonManager21
-# //------------------------------------------------
-# //------------------------------------------------
-
-# Copyright: Damien Elmes <anki@ichi2.net>
 # License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
+
+# Original Copyright: Damien Elmes <anki@ichi2.net>
+# License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
+
+# Files are backported from anki-2.1.5 src with a few mods here and there.
 
 import aqt, os, re
 from aqt import mw
@@ -38,11 +39,9 @@ class AddonsDialog(QDialog):
         self.form.addonList.currentRowChanged.connect(self._onAddonItemSelected)
         self.form.addonList.itemDoubleClicked.connect(self.onConfig)
 
-
-
-
         self.redrawAddons()
         self.show()
+
 
     def redrawAddons(self):
         self.addons = [(self.annotatedName(d), d) for d in self.mgr.allAddons()]
@@ -51,6 +50,8 @@ class AddonsDialog(QDialog):
         self.form.addonList.addItems([r[0] for r in self.addons])
         if self.addons:
             self.form.addonList.setCurrentRow(0)
+        self.addFilterBar()
+
 
     def _onAddonItemSelected(self, row_int):
         try:
@@ -165,4 +166,33 @@ class AddonsDialog(QDialog):
             return
 
         ConfigEditor(self, addon, conf)
+
+
+
+#MODS FROM: https://github.com/ijgnd/anki__misc/blob/master/addons_window_filter_bar_for_21.py
+    def addFilterBar(self):
+        #add filter bar
+        self.filterbar = QLineEdit(self)
+        self.filterbar.setPlaceholderText('type here to filter')
+        self.form.verticalLayout_2.addWidget(self.filterbar)
+        mw.progress.timer(1,self.filterbar.setFocus,False) #https://stackoverflow.com/a/52858926
+        self.filterbar.textChanged.connect(self.filterAddonList)
+
+
+#MODS FROM: https://github.com/ijgnd/anki__misc/blob/master/addons_window_filter_bar_for_21.py
+    def filterAddonList(self, text):
+        terms = text.lower().split()
+        addonList = self.form.addonList
+        selected = set(self.selectedAddons())
+        addonList.clear()
+        for name, dir in self.addons:
+            item = QListWidgetItem(name, addonList)
+            nl = name.lower()
+            for i in terms:
+                if i not in nl:
+                    item.setHidden(True)
+                    break
+            if dir in selected:
+                item.setSelected(True)
+        addonList.repaint()
 
