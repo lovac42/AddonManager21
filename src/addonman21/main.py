@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-# Files are backported from anki-2.1.5 src with a few mods here and there.
+# Copyright: (C) 2018-2019 Lovac42
 # Support: https://github.com/lovac42/AddonManager21
-# //------------------------------------------------
-# //------------------------------------------------
-
-# Copyright: Damien Elmes <anki@ichi2.net>
 # License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
+
+# Original Copyright: Damien Elmes <anki@ichi2.net>
+# License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
+
+# Files are backported from anki-2.1.5 src with a few mods here and there.
 
 import aqt, os, re, sys
 from aqt import mw
@@ -31,6 +32,7 @@ class AddonManager21(AddonManager):
         action = QAction('Addon Configurations...', mw)
         action.triggered.connect(self.onAddonsDialog)
         mw.form.menuTools.addAction(action)
+
 
     def setConfigUpdatedAction(self, module, fn):
         addon = self.addonFromModule(module)
