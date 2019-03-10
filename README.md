@@ -26,7 +26,7 @@ Addon writen using this method may use sym links (or NTFS junction points) and m
 
 
 ## Credits:
-I've added enhancements to addonman21 from other addon authors, listed below.
+I've added enhancements to addonman21 from other addon authors, listed below.  
 Show JSON's parsing error message, by Arthur-Milchior: https://ankiweb.net/shared/info/2061352905  
 Add-on window search bar, by ijgnd: https://ankiweb.net/shared/info/561945101  
 
