@@ -34,6 +34,9 @@ class AddonManager21(AddonManager):
         mw.form.menuTools.addAction(action)
 
 
+    def rebuildAddonsMenu(self):
+        return
+
     def setConfigUpdatedAction(self, module, fn):
         addon = self.addonFromModule(module)
         self._configUpdatedActions[addon] = fn
