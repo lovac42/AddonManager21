@@ -21,221 +21,246 @@ import urllib2
 
 USER_AGENT='Anki 2.0 Forever'
 
-
-class AddonManager21(AddonManager):
-    _configButtonActions = {}
-    _configUpdatedActions = {}
-
-    def __init__(self, mw):
-        self.mw = mw
-        self._menus = []
-        action = QAction('Addon Configurations...', mw)
-        action.triggered.connect(self.onAddonsDialog)
-        mw.form.menuTools.addAction(action)
+aqt.addons.AddonManager._configButtonActions = {}
+aqt.addons.AddonManager._configUpdatedActions = {}
 
 
-    def setConfigUpdatedAction(self, module, fn):
-        addon = self.addonFromModule(module)
-        self._configUpdatedActions[addon] = fn
+def addMenu(self):
+    action = QAction('Addon Configurations...', mw)
+    action.triggered.connect(self.onAddonsDialog)
+    mw.form.menuTools.addAction(action)
 
-    def configUpdatedAction(self, addon):
-        return self._configUpdatedActions.get(addon)
+def onAddonsDialog(self, path=None):
+    AddonsDialog(self)
 
-    def getConfig(self, module):
-        addon = self.addonFromModule(module)
-        # get default config
-        config = self.addonConfigDefaults(addon)
-        if config is None:
-            return None
-        # merge in user's keys
-        meta = self.addonMeta(addon)
-        userConf = meta.get("config", {})
-        # config.update(userConf)
-        config=nestedUpdate(config,userConf) #update nested dicts
-        return config
+def setConfigUpdatedAction(self, module, fn):
+    addon = self.addonFromModule(module)
+    self._configUpdatedActions[addon] = fn
 
-    def allAddons(self):
-        l = []
-        for d in os.listdir(self.addonsFolder()):
-            path = self.addonsFolder(d)
-            if not os.path.exists(os.path.join(path, "__init__.py")):
-                continue
-            l.append(d)
-        l.sort()
-        if os.getenv("ANKIREVADDONS", ""):
-            l = reversed(l)
-        return l
+def configUpdatedAction(self, addon):
+    return self._configUpdatedActions.get(addon)
 
-    def addonsFolder(self, dir=None):
-        root = self.mw.pm.addonFolder()
-        if not dir:
-            return root
-        return os.path.join(root, dir)
+def getConfig(self, module):
+    addon = self.addonFromModule(module)
+    # get default config
+    config = self.addonConfigDefaults(addon)
+    if config is None:
+        return None
+    # merge in user's keys
+    meta = self.addonMeta(addon)
+    userConf = meta.get("config", {})
+    # config.update(userConf)
+    config=nestedUpdate(config,userConf) #update nested dicts
+    return config
 
-    def _addonMetaPath(self, dir):
-        return os.path.join(self.addonsFolder(dir), "meta.json")
+def allAddons(self):
+    l = []
+    for d in os.listdir(self.addonsFolder()):
+        path = self.addonsFolder(d)
+        if not os.path.exists(os.path.join(path, "__init__.py")):
+            continue
+        l.append(d)
+    l.sort()
+    if os.getenv("ANKIREVADDONS", ""):
+        l = reversed(l)
+    return l
 
-    def addonName(self, dir):
-        return self.addonMetaID(dir).get("name", dir)
+def addonsFolder(self, dir=None):
+    root = self.mw.pm.addonFolder()
+    if not dir:
+        return root
+    return os.path.join(root, dir)
 
-    def configAction(self, addon):
-        return self._configButtonActions.get(addon)
+def _addonMetaPath(self, dir):
+    return os.path.join(self.addonsFolder(dir), "meta.json")
 
-    def configUpdatedAction(self, addon):
-        return self._configUpdatedActions.get(addon)
+def addonName(self, dir):
+    return self.addonMetaID(dir).get("name", dir)
 
-    def addonConfigHelp(self, dir):
-        path = os.path.join(self.addonsFolder(dir), "config.md")
-        if os.path.exists(path):
-            with open(path, encoding="utf-8") as f:
-                return f.read().replace('\n','<br>')
-        else:
-            return ""
+def configAction(self, addon):
+    return self._configButtonActions.get(addon)
 
-    def onAddonsDialog(self, path=None):
-        AddonsDialog(self)
- 
-    def writeConfig(self, module, conf):
-        addon = self.addonFromModule(module)
-        meta = self.addonMeta(addon)
-        meta['config'] = conf
-        self.writeAddonMeta(addon, meta)
+def configUpdatedAction(self, addon):
+    return self._configUpdatedActions.get(addon)
 
-    def writeAddonMeta(self, dir, meta):
-        path = self._addonMetaPath(dir)
-        with open(path, "w", encoding="utf8") as f:
-            json.dump(meta, f)
+def addonConfigHelp(self, dir):
+    path = os.path.join(self.addonsFolder(dir), "config.md")
+    if os.path.exists(path):
+        with open(path, encoding="utf-8") as f:
+            return f.read().replace('\n','<br>')
+    else:
+        return ""
+
+def writeConfig(self, module, conf):
+    addon = self.addonFromModule(module)
+    meta = self.addonMeta(addon)
+    meta['config'] = conf
+    self.writeAddonMeta(addon, meta)
+
+def writeAddonMeta(self, dir, meta):
+    path = self._addonMetaPath(dir)
+    with open(path, "w", encoding="utf8") as f:
+        json.dump(meta, f)
 
 #Use for writing addonID from custom input
-    def writeAddonMetaID(self, dir, meta):
-        path = os.path.join(self.addonsFolder(dir), "meta_id.json")
-        with open(path, "w", encoding="utf8") as f:
-            json.dump(meta, f)
 
-    def addonFromModule(self, module):
-        return module.split(".")[0]
+def writeAddonMetaID(self, dir, meta):
+    path = os.path.join(self.addonsFolder(dir), "meta_id.json")
+    with open(path, "w", encoding="utf8") as f:
+        json.dump(meta, f)
 
-    def addonsFolder(self, dir=None):
-        root = self.mw.pm.addonFolder()
-        if not dir:
-            return root
-        return os.path.join(root, dir)
+def addonFromModule(self, module):
+    return module.split(".")[0]
 
-    def managedAddons(self):
-        self.addonSID={}
-        addons=[]
-        for dir in self.allAddons():
-            try:
-                meta = self.addonMetaID(dir)
-                aoid=meta.get('addonID',None)
-                assert aoid
-                addons.append(aoid)
-                self.addonSID[aoid]=dir
-            except:
-                continue
-        return addons
+def addonsFolder(self, dir=None):
+    root = self.mw.pm.addonFolder()
+    if not dir:
+        return root
+    return os.path.join(root, dir)
+
+def managedAddons(self):
+    self.addonSID={}
+    addons=[]
+    for dir in self.allAddons():
+        try:
+            meta = self.addonMetaID(dir)
+            aoid=meta.get('addonID',None)
+            assert aoid
+            addons.append(aoid)
+            self.addonSID[aoid]=dir
+        except:
+            continue
+    return addons
 
 
     # Updating
     ######################################################################
 
-    def checkForUpdates(self):
-        # get mod times
-        self.mw.progress.start(immediate=True)
-        try:
-            # ..of enabled items downloaded from ankiweb
-            addons = self.managedAddons()
-            mods = []
-            while addons:
-                chunk = addons[:25]
-                del addons[:25]
-                mods.extend(self._getModTimes(None, chunk))
-            return self._updatedIds(mods)
-        finally:
-            self.mw.progress.finish()
 
-    def _getModTimes(self, client, chunk):
-        try:
-            url=aqt.appShared + "updates/" + ",".join(chunk)
-            crawler = urllib2.build_opener()
-            crawler.addheaders = [('User-agent', USER_AGENT)]
-            c = crawler.open(url)
-            data=c.read()
-            return json.loads(data)
-        except ValueError:
-           utils.showInfo("Not a valid url")
-           return
-        except urllib2.HTTPError as error:
-            showWarning('The remote server has returned an error:'
-                        ' HTTP Error {} ({})'.format(error.code,error.reason))
-            return
+def checkForUpdates(self):
+    # get mod times
+    self.mw.progress.start(immediate=True)
+    try:
+        # ..of enabled items downloaded from ankiweb
+        addons = self.managedAddons()
+        mods = []
+        while addons:
+            chunk = addons[:25]
+            del addons[:25]
+            mods.extend(self._getModTimes(None, chunk))
+        return self._updatedIds(mods)
+    finally:
+        self.mw.progress.finish()
 
-    def _updatedIds(self, mods):
-        updated = []
-        for dir, ts in mods:
-            if not ts: continue #null for anki 2.0 only addons, use a fake __init__ file to set time on server.
+def _getModTimes(self, client, chunk):
+    try:
+        url=aqt.appShared + "updates/" + ",".join(chunk)
+        crawler = urllib2.build_opener()
+        crawler.addheaders = [('User-agent', USER_AGENT)]
+        c = crawler.open(url)
+        data=c.read()
+        return json.loads(data)
+    except ValueError:
+       utils.showInfo("Not a valid url")
+       return
+    except urllib2.HTTPError as error:
+        showWarning('The remote server has returned an error:'
+                    ' HTTP Error {} ({})'.format(error.code,error.reason))
+        return
 
-            sid = self.addonSID.get(str(dir),None)
-            if not sid: continue
+def _updatedIds(self, mods):
+    updated = []
+    for dir, ts in mods:
+        if not ts: continue #null for anki 2.0 only addons, use a fake __init__ file to set time on server.
 
-            meta=self.addonMeta(sid)
-            mod=int(meta.get("mod","-1"))
-            if mod < ts:
-                updated.append(sid)
-                #Mark as updated
-                meta['mod'] = str(ts)
-                self.writeAddonMeta(sid, meta)
-        return updated
+        sid = self.addonSID.get(str(dir),None)
+        if not sid: continue
 
-
-
-#MODS FROM: https://github.com/Arthur-Milchior/anki-debug-json/blob/master/jsonErrorMessage.py
-    def addonConfigDefaults(self, dir):
-        path = os.path.join(self.addonsFolder(dir), "config.json")
-        try:
-            with open(path, encoding="utf8") as f:
-                t=f.read()
-                try:
-                    return json.loads(t)
-                except Exception as e:
-                    print "Here is a JSON error in default config of addon {dir}:".format(dir=sys.stderr)
-                    print str(e)
-                    print "\n\n===================\n\nCopy and save past config to be sure that it is not overwritten by accident. Past config was {t}".format(t=sys.stderr)
-                    return dict()
-        except:
-            return None
+        meta=self.addonMeta(sid)
+        mod=int(meta.get("mod","-1"))
+        if mod < ts:
+            updated.append(sid)
+            #Mark as updated
+            meta['mod'] = str(ts)
+            self.writeAddonMeta(sid, meta)
+    return updated
 
 
 #MODS FROM: https://github.com/Arthur-Milchior/anki-debug-json/blob/master/jsonErrorMessage.py
-    def addonMeta(self, dir):
-        path = self._addonMetaPath(dir)
-        try:
-            with open(path, encoding="utf8") as f:
-                t=f.read()
-                try:
-                    return json.loads(t)
-                except Exception as e:
-                    print "Here is a JSON error in current config of addon {dir}:".format(dir=sys.stderr)
-                    print str(e)
-                    print "\n\n===================\n\n \
-Copy and save past config to be sure that it is not overwritten by accident. Past config was {t}".format(t=sys.stderr)
-        except: pass
-        return dict()
+def addonConfigDefaults(self, dir):
+    path = os.path.join(self.addonsFolder(dir), "config.json")
+    try:
+        with open(path, encoding="utf8") as f:
+            t=f.read()
+            try:
+                return json.loads(t)
+            except Exception as e:
+                print "Here is a JSON error in default config of addon {dir}:".format(dir=sys.stderr)
+                print str(e)
+                print "\n\n===================\n\nCopy and save past config to be sure that it is not overwritten by accident. Past config was {t}".format(t=sys.stderr)
+                return dict()
+    except:
+        return None
 
-    def addonMetaID(self, dir):
-        path = os.path.join(self.addonsFolder(dir), "meta_id.json")
-        try:
-            with open(path, encoding="utf8") as f:
-                t=f.read()
-                try:
-                    return json.loads(t)
-                except Exception as e:
-                    print "Here is a JSON error in current config of addon {dir}:".format(dir=sys.stderr)
-                    print str(e)
-                    print "\n\n===================\n\n \
+
+#MODS FROM: https://github.com/Arthur-Milchior/anki-debug-json/blob/master/jsonErrorMessage.py
+def addonMeta(self, dir):
+    path = self._addonMetaPath(dir)
+    try:
+        with open(path, encoding="utf8") as f:
+            t=f.read()
+            try:
+                return json.loads(t)
+            except Exception as e:
+                print "Here is a JSON error in current config of addon {dir}:".format(dir=sys.stderr)
+                print str(e)
+                print "\n\n===================\n\n \
 Copy and save past config to be sure that it is not overwritten by accident. Past config was {t}".format(t=sys.stderr)
-        except: pass
-        return dict()
+    except: pass
+    return dict()
+
+
+def addonMetaID(self, dir):
+    path = os.path.join(self.addonsFolder(dir), "meta_id.json")
+    try:
+        with open(path, encoding="utf8") as f:
+            t=f.read()
+            try:
+                return json.loads(t)
+            except Exception as e:
+                print "Here is a JSON error in current config of addon {dir}:".format(dir=sys.stderr)
+                print str(e)
+                print "\n\n===================\n\n \
+Copy and save past config to be sure that it is not overwritten by accident. Past config was {t}".format(t=sys.stderr)
+    except: pass
+    return dict()
+
+
+
+aqt.addons.AddonManager.addMenu = addMenu 
+aqt.addons.AddonManager.setConfigUpdatedAction = setConfigUpdatedAction 
+aqt.addons.AddonManager.configUpdatedAction = configUpdatedAction
+aqt.addons.AddonManager.getConfig = getConfig 
+aqt.addons.AddonManager.allAddons = allAddons 
+aqt.addons.AddonManager.addonsFolder = addonsFolder 
+aqt.addons.AddonManager._addonMetaPath = _addonMetaPath 
+aqt.addons.AddonManager.addonName = addonName 
+aqt.addons.AddonManager.configAction = configAction 
+aqt.addons.AddonManager.configUpdatedAction = configUpdatedAction 
+aqt.addons.AddonManager.addonConfigHelp = addonConfigHelp 
+aqt.addons.AddonManager.onAddonsDialog = onAddonsDialog 
+aqt.addons.AddonManager.writeConfig = writeConfig 
+aqt.addons.AddonManager.writeAddonMeta = writeAddonMeta 
+aqt.addons.AddonManager.writeAddonMetaID = writeAddonMetaID 
+aqt.addons.AddonManager.addonFromModule = addonFromModule 
+aqt.addons.AddonManager.addonsFolder = addonsFolder 
+aqt.addons.AddonManager.managedAddons = managedAddons 
+aqt.addons.AddonManager.checkForUpdates = checkForUpdates 
+aqt.addons.AddonManager._getModTimes = _getModTimes 
+aqt.addons.AddonManager._updatedIds = _updatedIds 
+aqt.addons.AddonManager.addonConfigDefaults = addonConfigDefaults 
+aqt.addons.AddonManager.addonMeta = addonMeta 
+aqt.addons.AddonManager.addonMetaID = addonMetaID 
 
 
 
@@ -249,3 +274,4 @@ def nestedUpdate(d,u):
         else:
             d[k] = v
     return d
+

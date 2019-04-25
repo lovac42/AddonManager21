@@ -11,7 +11,7 @@ from .main import *
 
 def setupProfile(self):
     if not self.addon_loaded:
-        self.addonManager = AddonManager21(self)
+        self.addonManager.addMenu()
         self.addon_loaded=True
 
 aqt.main.AnkiQt.addon_loaded=False
