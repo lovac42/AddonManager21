@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-# Copyright: (C) 2018-2019 Lovac42
+# Copyright: (C) 2018-2020 Lovac42
 # Support: https://github.com/lovac42/AddonManager21
 # License: GNU GPL, version 3 or later; http://www.gnu.org/copyleft/gpl.html
-# Version: 0.0.5
+# Version: 0.0.6
 
 
 from aqt import mw
@@ -34,9 +34,12 @@ class Config():
 
 
     def _onProfileLoaded(self):
-        # wait for addonManager21 to load first.
-        # Timer is no longer necessary for newer versions of AddonManager21
-        mw.progress.timer(300,self._loadConfig,False)
+        if ANKI21: # or ccbc
+            self._loadConfig()
+        else:
+            # wait for addonManager21 to load first.
+            # Timer is no longer necessary for newer versions of AddonManager21
+            mw.progress.timer(300,self._loadConfig,False)
 
     def _loadConfig(self):
         if getattr(mw.addonManager, "getConfig", None):
